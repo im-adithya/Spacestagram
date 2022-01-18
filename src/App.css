@@ -60,6 +60,10 @@
   font-size: 0.9rem !important;
 }
 
+.dropdown-menu{
+  position: absolute !important;
+}
+
 .dropdown-toggle {
   padding: 6px !important;
 }
