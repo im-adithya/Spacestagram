@@ -129,7 +129,7 @@ const ProfileScreen = () => {
 
   return (
     <Container className={'px-0 ' + (user ? 'top-space-2' : '')}>
-      <div className="profile d-flex align-items-center pl-4">
+      <div className="profile mt-3 mt-md-0 d-flex align-items-center pl-4">
         <Image
           src={id === 5 ? user.photoURL : pictureFetcher(id)}
           className="rounded-circle profile-dp m-md-5"
