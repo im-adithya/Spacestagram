@@ -1,24 +1,28 @@
-import logo from './logo.svg';
+import React from 'react';
+import { BrowserRouter as Router, Route } from 'react-router-dom';
+
 import './App.css';
+import 'bootstrap/dist/css/bootstrap.min.css';
+
+import { AuthProvider } from './Auth';
+import PrivateRoute from './PrivateRoute';
+import Header from './components/Header';
+import LandingScreen from './screens/LandingScreen';
+import ProfileScreen from './screens/ProfileScreen';
+import PostScreen from './screens/PostScreen';
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <AuthProvider>
+      <Router>
+        <Header />
+        <main>
+          <Route exact path="/" component={LandingScreen} />
+          <PrivateRoute exact path="/:acc_id" component={ProfileScreen} />
+          <PrivateRoute path="/p/:acc_id/:post_id" component={PostScreen} />
+        </main>
+      </Router>
+    </AuthProvider>
   );
 }
 
