@@ -1,70 +1,40 @@
-# Getting Started with Create React App
+<p align="center">
+   <img src="https://user-images.githubusercontent.com/64399555/150025598-c5acf58f-a4f9-4ede-99cd-4458dbffc824.jpg">
+</p>
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+<h1 align="center">Spacestagram</h1>
+<p align="center">
+    <img src="https://img.shields.io/github/issues/im-adithya/Spacestagram?style=flat&logo=buffer&color=blueviolet&logoColor=white">
+    <img src="https://img.shields.io/github/issues-closed/im-adithya/Spacestagram?style=flat&logo=checkmarx&color=success&logoColor=white">
+    <img src="https://img.shields.io/github/forks/im-adithya/Spacestagram?style=flat&logo=git&color=informational&logoColor=white">
+    <img src="https://img.shields.io/github/stars/im-adithya/Spacestagram?style=flat&logo=reverbnation&color=yellow&logoColor=white">
+    <img src="https://img.shields.io/github/license/im-adithya/Spacestagram?style=flat&logo=read-the-docs&color=orange&logoColor=white">
+</p>
+<p align="center">Spacestagram fetches stellar pictures captured by the people at NASA, with an interface you are quite accustomed to ;)</p>
 
-## Available Scripts
+<p align="center">Try it out <a href="https://space-stagram.web.app/">here! 🛰</a></p>
 
-In the project directory, you can run:
 
-### `npm start`
+## How It Works
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+- Spacestagram fetches images from 4 different APIs
+- The whole process of fetching these requests is too complex, as different APIs have different responses
+- For uniformity, these requests are mapped and changed to our convenience.
+- Then the data is displayed as images posted by different accounts (one for each API) in your feed.
+- This process of data collection is time-consuming, hence the data is stored in localStorage for faster access.
+- It also stores your liked and starred posts and shows it (only to you) in your profile!
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## Features
 
-### `npm test`
+- Login instantly with Google Sign-In
+- Colorful (Instagram-inspired) UI to view images
+- View photos from 4 different APIs
+- APOD Story - Astronomy Picture of the Day
+- Full Screen View
+- Share your favourite images
+- Star and Like Posts to view later
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## Note
 
-### `npm run build`
+This project is made as a submission for Shopify Front End Developer Intern Challenge - Summer 2022
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
