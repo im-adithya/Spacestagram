@@ -347,27 +347,26 @@
 }
 
 @keyframes like-animation {
-  0%, to {
+  0%,
+  to {
     opacity: 0;
-    -webkit-transform: scale(0);
-    transform: scale(0), translate(-50%, -50%) !important;
+    -webkit-transform: scale(0), translate(-50%, -50%);
+    transform: scale(0), translate(-50%, -50%);
   }
-
   15% {
-    opacity: 0.8;
-    -webkit-transform: scale(1.4);
-    transform: scale(1.4), translate(-50%, -50%) !important;
+    opacity: 0.9;
+    -webkit-transform: scale(1.2), translate(-50%, -50%);
+    transform: scale(1.2), translate(-50%, -50%) ;
   }
-
-  40% {
-    -webkit-transform: scale(0.25);
-    transform: scale(0.25), translate(-50%, -50%) !important;
+  30% {
+    -webkit-transform: scale(0.95);
+    transform: scale(0.95), translate(-50%, -50%);
   }
-
-  65%, 80% {
-    opacity: 0.8;
-    -webkit-transform: scale(1);
-    transform: scale(1), translate(-50%, -50%) !important;
+  45%,
+  80% {
+    opacity: 0.9;
+    -webkit-transform: scale(1), translate(-50%, -50%);
+    transform: scale(1), translate(-50%, -50%);
   }
 }
 
