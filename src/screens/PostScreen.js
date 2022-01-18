@@ -37,7 +37,6 @@ const LandingScreen = () => {
           createEPICRequests(path[2]).then((res) => {
             setPost(EPICSingleRespHandler(res.data));
             setLoad(false);
-            console.log(post);
           });
           break;
         case 2:

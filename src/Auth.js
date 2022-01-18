@@ -25,7 +25,6 @@ export const AuthProvider = ({ children }) => {
       }
       const ref = firebase.database().ref('user/' + user?.uid);
       ref.once('value').then((snapshot) => {
-        console.log(snapshot.val());
         setFollowing(snapshot.val() ? snapshot.val().following : [0, 1, 3]);
         setLiked(snapshot.val() ? snapshot.val().liked : []);
         setStarred(snapshot.val() ? snapshot.val().starred : []);

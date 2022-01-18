@@ -39,7 +39,6 @@ const HomeScreen = () => {
   const { feed, setFeed } = useContext(AuthContext).feed;
   const { apod, setApod } = useContext(AuthContext).apod;
   const { following, setFollowing } = useContext(AuthContext).following;
-  console.log(following);
 
   const followHandler = (account_id) => {
     if (following.includes(account_id)) {
@@ -115,7 +114,6 @@ const HomeScreen = () => {
       setLoad(false);
     };
     setProgress(10);
-    console.log(feed, load);
     if (feed.length === 0) loader();
     else setLoad(false);
   }, []);

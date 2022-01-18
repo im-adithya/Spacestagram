@@ -29,7 +29,6 @@ export const createMaRoPhoRequests = (date) => {
 export const createStarLikeRequests = (identifier) => {
   const account = identifier.split('/')[0];
   const id = identifier.split('/')[1];
-  console.log(account, id);
   if (parseInt(account) === 0)
     return axios.get(
       `https://api.nasa.gov/planetary/apod?api_key=${REACT_APP_NASA_KEY}&date=${id}`
@@ -61,14 +60,12 @@ export const EarthRequest = `https://images-api.nasa.gov/search?q=earth&media_ty
 
 export const starLikeRequests = (starLike) => {
   const arr = starLike.slice(1);
-  console.log(arr);
   return arr.map((p) => createStarLikeRequests(p));
 };
 
 const imageGenerator = (identifier, index, starLikeResps) => {
   const account = identifier.split('/')[0];
   const id = identifier.split('/')[1];
-  console.log(account, id);
   switch (parseInt(account)) {
     case 0:
       return starLikeResps[index].url;
@@ -89,9 +86,7 @@ const imageGenerator = (identifier, index, starLikeResps) => {
 
 export const starLikeRespHandler = (resps, starLike) => {
   const arr = starLike.slice(1);
-  console.log(resps);
   let starLikeResps = resps.map((resp) => (resp ? resp.data : [])).filter((n) => n);
-  console.log(starLikeResps);
   return arr.map((identifier, index) => {
     var o = {};
     o.id = identifier;
@@ -125,12 +120,10 @@ export const APODSingleRespHandler = (resp) => {
 };
 
 export const APODTodayRespHandler = (resp) => {
-  console.log(resp);
   var o = {};
   o.date = resp.data.date;
   o.description = resp.data.explanation;
   o.photoURL = resp.data.url;
-  console.log(o);
   return o;
 };
 

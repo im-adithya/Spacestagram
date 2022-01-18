@@ -30,7 +30,6 @@ const Post = ({ account_id, id, photoURL, description, date, fullpage }) => {
   const { starred, setStarred } = useContext(AuthContext).starred;
   const { setPopup } = useContext(AuthContext).popup;
   const { setFullView } = useContext(AuthContext).fv;
-  console.log(liked, starred);
 
   const [heartAnimate, setHeartAnimate] = useState(false);
 

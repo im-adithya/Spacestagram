@@ -9,7 +9,6 @@ import link from '../assets/link.svg';
 import cross from '../assets/cross.svg';
 
 const FullViewer = ({ fullView }) => {
-  console.log();
   const redir = fullView.split('///')[0];
   const photoURL = fullView.split(':')[1];
   const history = useHistory();

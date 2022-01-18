@@ -112,12 +112,10 @@ const ProfileScreen = () => {
       if (id === 5) {
         wall[5] = starredPosts.reverse();
         wall[6] = likedPosts.reverse();
-        console.log(wall[5], wall[6]);
       } else wall[id] = profilePosts;
       setWall(wall);
       setLoad(false);
     };
-    console.log(wall, wall[id]);
     if (!wall[id]) load();
     /*if (id !== 5 && !wall[id] === 0) load();
     else if (id === 5 && ((starred.length !==0 && wall[5].length === 0) || (liked.length !==0 && wall[6].length === 0))) load();*/ else
