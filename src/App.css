@@ -322,7 +322,7 @@
 
 .gallery-item {
   position: relative;
-  flex: 0 0 30%;
+  flex: 0 0 calc(33.33% - 0.6rem);
   margin: 0.3rem;
   color: #fff;
   cursor: pointer;
@@ -419,6 +419,7 @@
   }
 
   .gallery-item {
+    flex: 0 0 calc(33.33% - 2rem);
     margin: 1rem;
   }
 }
