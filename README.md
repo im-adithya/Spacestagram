@@ -10,7 +10,7 @@
     <img src="https://img.shields.io/github/stars/im-adithya/Spacestagram?style=flat&logo=reverbnation&color=yellow&logoColor=white">
     <img src="https://img.shields.io/github/license/im-adithya/Spacestagram?style=flat&logo=read-the-docs&color=orange&logoColor=white">
 </p>
-<p align="center">Spacestagram fetches stellar pictures captured by the people at NASA, with an interface you are quite accustomed to ;)</p>
+<p align="center">Spacestagram fetches stellar pictures captured by the people at NASA,<br/> with an interface you are quite accustomed to ;)</p>
 
 <p align="center">Try it out <a href="https://space-stagram.web.app/">here! 🛰</a></p>
 
@@ -22,6 +22,7 @@
 - For uniformity, these requests are mapped and changed to our convenience.
 - Then the data is displayed as images posted by different accounts (one for each API) in your feed.
 - This process of data collection is time-consuming, hence the data is stored in localStorage for faster access.
+- On creation of account, you'll start with following three accounts (out of 5 accounts in total)
 - It also stores your liked and starred posts and shows it (only to you) in your profile!
 
 ## Features
