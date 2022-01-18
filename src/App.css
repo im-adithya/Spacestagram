@@ -311,6 +311,7 @@
 }
 
 .gallery {
+  display: flex;
   flex-wrap: wrap;
   margin: -1rem 0;
   margin-top: 0rem;
