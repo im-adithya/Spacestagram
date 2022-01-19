@@ -12,6 +12,7 @@ import { BIOS } from '../constants/bios';
 import { USERNAMES } from '../constants/usernames';
 import {
   APODRespHandler,
+  APODTodayRespHandler,
   EPICRespHandler,
   NASARespHandler,
   MaRoPhoRespHandler,
@@ -20,12 +21,19 @@ import {
 } from '../constants/requests';
 import {
   APODRequests,
+  APODTodayRequest,
   EPICRequests,
   NASARequests,
   MaRoPhoRequests,
   EarthRequest,
   starLikeRequests
 } from '../constants/requests';
+import {
+  generateDates as generateFeedDates,
+  generateES as generateFeedES,
+  generateNS as generateFeedNS
+} from '../actions/feedHelpers';
+import { generateDates, generateNS } from '../actions/profileHelpers';
 
 import { AuthContext } from '../Auth';
 import Loader from '../components/Loader';
@@ -57,38 +65,75 @@ const ProfileScreen = () => {
   const starred = useContext(AuthContext).starred.starred;
 
   const [wall, setWall] = useState([]);
+  const { feed, setFeed } = useContext(AuthContext).feed;
+  const { setApod } = useContext(AuthContext).apod;
   const { following, setFollowing } = useContext(AuthContext).following;
+  const { setPopup } = useContext(AuthContext).popup;
 
-  const followHandler = (account_id) => {
+  const followHandler = async (account_id) => {
     if (following.includes(account_id)) {
       let newFollowing = following.filter((a) => a !== account_id);
       setFollowing(newFollowing);
       followAccount(newFollowing);
+
+      setPopup(`Unfollowed ${USERNAMES[account_id]}`);
+      setTimeout(() => {
+        setPopup(null);
+      }, 1200);
+
+      const newFeed = feed.filter((post) => post.account !== account_id);
+      setFeed([]);
+      localStorage.setItem(
+        'home-date',
+        JSON.stringify({ date: new Date().getDate(), month: new Date().getMonth() })
+      );
+      localStorage.setItem('feed', JSON.stringify(newFeed));
     } else {
+      const existingFeed = feed;
+      if (account_id === 0)
+        existingFeed.push(...APODRespHandler(await axios.all(APODRequests(generateFeedDates(2)))));
+      if (account_id === 0) setApod(APODTodayRespHandler(await axios.get(APODTodayRequest)));
+      if (account_id === 1)
+        existingFeed.push(...EPICRespHandler(await axios.all(EPICRequests(generateFeedDates(2)))));
+      if (account_id === 2)
+        existingFeed.push(
+          ...NASARespHandler(
+            await axios.all(NASARequests(generateFeedNS().fiveDCodes)),
+            generateFeedNS().fiveDCodes,
+            true,
+            generateFeedNS().actualNS
+          )
+        );
+      if (account_id === 3)
+        existingFeed.push(
+          ...MaRoPhoRespHandler(await axios.all(MaRoPhoRequests(generateFeedDates(2))))
+        );
+      if (account_id === 4)
+        existingFeed.push(
+          ...earthRespHandler(await axios.get(EarthRequest), generateFeedES(), true)
+        );
+
+      existingFeed.sort((a, b) =>
+        hyphenToDate(a.date) > hyphenToDate(b.date)
+          ? -1
+          : hyphenToDate(b.date) > hyphenToDate(a.date)
+          ? 1
+          : 0
+      );
+      localStorage.setItem(
+        'home-date',
+        JSON.stringify({ date: new Date().getDate(), month: new Date().getMonth() })
+      );
+      localStorage.setItem('feed', JSON.stringify(existingFeed));
+      setFeed([]);
+      setPopup(`Started following ${USERNAMES[account_id]}`);
+      setTimeout(() => {
+        setPopup(null);
+      }, 1200);
+
       setFollowing([...following, account_id]);
       followAccount([...following, account_id]);
     }
-  };
-
-  const generateDates = (start) => {
-    let dates = [];
-    const date = new Date();
-    date.setDate(date.getDate() - start);
-    for (let i = 0; i < 18; i++) {
-      dates.push(date.toISOString().split('T')[0]);
-      date.setDate(date.getDate() - 1);
-    }
-    return dates;
-  };
-
-  const generateNS = (start) => {
-    let actualNS = start + 1;
-    let fiveDCodes = [];
-    for (let i = 0; i < 19; i++) {
-      fiveDCodes.push(actualNS);
-      actualNS++;
-    }
-    return fiveDCodes.map((c) => c.toString().padStart(5, '0'));
   };
 
   useEffect(() => {

@@ -25,6 +25,7 @@ import {
   MaRoPhoRequests,
   EarthRequest
 } from '../constants/requests';
+import { generateDates, generateES, generateNS } from '../actions/feedHelpers';
 
 import { AuthContext } from '../Auth';
 import Loader from '../components/Loader';
@@ -47,8 +48,8 @@ const HomeScreen = () => {
   const storedApod = JSON.parse(localStorage.getItem('apod'));
   const storedReplenish = parseInt(localStorage.getItem('home-replenish'));
 
-  const [feed, setFeed] = useState([]);
-  const [apod, setApod] = useState({});
+  const { feed, setFeed } = useContext(AuthContext).feed;
+  const { apod, setApod } = useContext(AuthContext).apod;
   const [replenish, setReplenish] = useState(storedDateMatch ? storedReplenish : 0);
   const { following, setFollowing } = useContext(AuthContext).following;
   const { setPopup } = useContext(AuthContext).popup;
@@ -66,6 +67,10 @@ const HomeScreen = () => {
 
       const newFeed = feed.filter((post) => post.account !== account_id);
       setFeed(newFeed);
+      localStorage.setItem(
+        'home-date',
+        JSON.stringify({ date: new Date().getDate(), month: new Date().getMonth() })
+      );
       localStorage.setItem('feed', JSON.stringify(newFeed));
     } else {
       const existingFeed = feed;
@@ -97,6 +102,10 @@ const HomeScreen = () => {
           ? 1
           : 0
       );
+      localStorage.setItem(
+        'home-date',
+        JSON.stringify({ date: new Date().getDate(), month: new Date().getMonth() })
+      );
       localStorage.setItem('feed', JSON.stringify(existingFeed));
       setFeed(existingFeed);
       setPopup(`Started following ${USERNAMES[account_id]}`);
@@ -107,39 +116,6 @@ const HomeScreen = () => {
       setFollowing([...following, account_id]);
       followAccount([...following, account_id]);
     }
-  };
-
-  const generateDates = (start) => {
-    let dates = [];
-    const date = new Date();
-    date.setDate(date.getDate() - start);
-    for (let i = 0; i < 5; i++) {
-      dates.push(date.toISOString().split('T')[0]);
-      date.setDate(date.getDate() - 1);
-    }
-    return dates;
-  };
-
-  const generateES = () => {
-    // For Earth
-    if (localStorage.getItem('earth') === null) localStorage.setItem('earth', 0);
-    const earthStart = parseInt(localStorage.getItem('earth'));
-    return earthStart - 2 < 0 ? 0 : earthStart - 2;
-  };
-
-  const generateNS = () => {
-    // For NASA
-    if (localStorage.getItem('nasa') === null) localStorage.setItem('nasa', 1);
-    const nasaStart = parseInt(localStorage.getItem('nasa'));
-    let actualNS = nasaStart - 2 < 0 ? 1 : nasaStart - 2;
-
-    let fiveDCodes = [];
-    for (let i = 0; i < 5; i++) {
-      fiveDCodes.push(actualNS);
-      actualNS++;
-    }
-
-    return { fiveDCodes: fiveDCodes.map((c) => c.toString().padStart(5, '0')), actualNS };
   };
 
   useEffect(() => {
