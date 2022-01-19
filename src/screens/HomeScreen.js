@@ -38,6 +38,7 @@ import Loader from '../components/Loader';
 import APOD from '../components/APOD';
 import Post from '../components/Post';
 import spinner from '../assets/spinner.svg';
+import none from '../assets/none.svg';
 
 const HomeScreen = () => {
   const [load, setLoad] = useState(true);
@@ -110,7 +111,12 @@ const HomeScreen = () => {
         );
       if (account_id === 4)
         existingFeed.push(
-          ...earthRespHandler(await axios.get(EarthRequest), generateES(), 5 * (replenish + 1))
+          ...earthRespHandler(
+            await axios.get(EarthRequest),
+            generateES(),
+            true,
+            5 * (replenish + 1)
+          )
         );
 
       existingFeed.sort((a, b) =>
@@ -138,7 +144,11 @@ const HomeScreen = () => {
 
   useEffect(() => {
     const scrolling_function = () => {
-      if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 10 && !repLoad) {
+      if (
+        window.innerHeight + window.scrollY >= document.body.offsetHeight - 10 &&
+        !repLoad &&
+        following.length > 0
+      ) {
         window.removeEventListener('scroll', scrolling_function);
         setRepLoad(true);
         setReplenish(replenish + 1);
@@ -174,7 +184,7 @@ const HomeScreen = () => {
         feedPosts.push(...MaRoPhoRespHandler(await axios.all(MaRoPhoRequests(generateDates(2)))));
       setProgress(85);
       if (following.includes(4))
-        feedPosts.push(...earthRespHandler(await axios.get(EarthRequest), generateES(), true));
+        feedPosts.push(...earthRespHandler(await axios.get(EarthRequest), generateES(), true, 5));
       setProgress(100);
 
       feedPosts.sort((a, b) =>
@@ -220,7 +230,9 @@ const HomeScreen = () => {
           ...MaRoPhoRespHandler(await axios.all(MaRoPhoRequests(generateDates(2 + replenish * 5))))
         );
       if (following.includes(4))
-        newFeedPosts.push(...earthRespHandler(await axios.get(EarthRequest), generateES(), true));
+        newFeedPosts.push(
+          ...earthRespHandler(await axios.get(EarthRequest), generateES(), true, 5)
+        );
       newFeedPosts.sort((a, b) =>
         hyphenToDate(a.date) > hyphenToDate(b.date)
           ? -1
@@ -257,7 +269,7 @@ const HomeScreen = () => {
     <Container>
       <Row>
         <Col xs={12} md={8} className="top-space-1">
-          {following.includes(0) && (
+          {(following ? following : []).includes(0) && (
             <APOD photoURL={apod.photoURL} description={apod.description} date={apod.date} />
           )}
           {feed.map((post, index) => {
@@ -272,6 +284,12 @@ const HomeScreen = () => {
               />
             );
           })}
+          {!following && (
+            <>
+              <Image src={none} className="d-block mx-auto mt-5" width="250px" />
+              <p className="text-17 mt-3 text-center">Follow accounts to view images here.</p>
+            </>
+          )}
           {repLoad && <Image src={spinner} width="100px" className="d-block mx-auto" />}
         </Col>
         <Col className="d-none d-md-block" md={4}>
@@ -298,7 +316,7 @@ const HomeScreen = () => {
             </div>
             <div className="mb-3">
               <p className="text-3">Accounts you follow</p>
-              {following.map((value, index) => {
+              {(following ? following : []).map((value, index) => {
                 return (
                   <div
                     className="d-flex align-items-center justify-content-between mb-2"
@@ -327,32 +345,34 @@ const HomeScreen = () => {
             </div>
             <div className="mb-3">
               <p className="text-3">Suggestions for you</p>
-              {ALL_ACCOUNTS.filter((a) => !following.includes(a)).map((value, index) => {
-                return (
-                  <div
-                    className="d-flex align-items-center justify-content-between mb-2"
-                    key={index}>
+              {ALL_ACCOUNTS.filter((a) => !(following ? following : []).includes(a)).map(
+                (value, index) => {
+                  return (
                     <div
-                      className="d-flex align-items-center pointer"
-                      onClick={() => {
-                        history.push('/' + USERNAMES[value].toLowerCase());
-                      }}>
-                      <Image
-                        src={pictureFetcher(value)}
-                        width="40px"
-                        className="rounded-circle home-dp"
-                      />
-                      <div className="ml-3">
-                        <p className="text-5 mb-0">{USERNAMES[value]}</p>
-                        <p className="text-6 mb-0">{ACCOUNTS[value]}</p>
+                      className="d-flex align-items-center justify-content-between mb-2"
+                      key={index}>
+                      <div
+                        className="d-flex align-items-center pointer"
+                        onClick={() => {
+                          history.push('/' + USERNAMES[value].toLowerCase());
+                        }}>
+                        <Image
+                          src={pictureFetcher(value)}
+                          width="40px"
+                          className="rounded-circle home-dp"
+                        />
+                        <div className="ml-3">
+                          <p className="text-5 mb-0">{USERNAMES[value]}</p>
+                          <p className="text-6 mb-0">{ACCOUNTS[value]}</p>
+                        </div>
+                      </div>
+                      <div className="text-4 ml-2 pointer" onClick={() => followHandler(value)}>
+                        Follow
                       </div>
                     </div>
-                    <div className="text-4 ml-2 pointer" onClick={() => followHandler(value)}>
-                      Follow
-                    </div>
-                  </div>
-                );
-              })}
+                  );
+                }
+              )}
             </div>
             <p className="text-8 mb-0">
               &copy; 2022{' '}
