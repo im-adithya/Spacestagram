@@ -31,11 +31,14 @@ import { AuthContext } from '../Auth';
 import Loader from '../components/Loader';
 
 import none from '../assets/none.svg';
+import spinner from '../assets/spinner.svg';
 
 const ProfileScreen = () => {
   const history = useHistory();
   const location = useLocation();
   const [load, setLoad] = useState(true);
+  const [repLoad, setRepLoad] = useState(false);
+  const [replenish, setReplenish] = useState(0);
 
   const user = useContext(AuthContext).currentUser;
 
@@ -60,44 +63,62 @@ const ProfileScreen = () => {
     }
   };
 
-  useEffect(() => {
+  const generateDates = (start) => {
     let dates = [];
     const date = new Date();
-    date.setDate(date.getDate() - 2);
+    date.setDate(date.getDate() - start);
     for (let i = 0; i < 18; i++) {
       dates.push(date.toISOString().split('T')[0]);
       date.setDate(date.getDate() - 1);
     }
+    return dates;
+  };
 
-    // For NASA
-    let actualNS = 1;
-
+  const generateNS = (start) => {
+    let actualNS = start + 1;
     let fiveDCodes = [];
-    for (let i = 0; i < 18; i++) {
+    for (let i = 0; i < 19; i++) {
       fiveDCodes.push(actualNS);
       actualNS++;
     }
+    return fiveDCodes.map((c) => c.toString().padStart(5, '0'));
+  };
 
-    fiveDCodes = fiveDCodes.map((c) => c.toString().padStart(5, '0'));
+  useEffect(() => {
+    const scrolling_function = () => {
+      if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 10 && !repLoad) {
+        window.removeEventListener('scroll', scrolling_function);
+        setRepLoad(true);
+        setReplenish(replenish + 1);
+      }
+    };
+    if (!repLoad) window.addEventListener('scroll', scrolling_function);
+  }, [repLoad]);
 
+  useEffect(() => {
     const load = async () => {
       const profilePosts = [];
       const starredPosts = [];
       const likedPosts = [];
-      if (id === 0) profilePosts.push(...APODRespHandler(await axios.all(APODRequests(dates))));
-      if (id === 1) profilePosts.push(...EPICRespHandler(await axios.all(EPICRequests(dates))));
+      if (id === 0)
+        profilePosts.push(...APODRespHandler(await axios.all(APODRequests(generateDates(2)))));
+      if (id === 1)
+        profilePosts.push(...EPICRespHandler(await axios.all(EPICRequests(generateDates(2)))));
       if (id === 2)
         profilePosts.push(
-          ...NASARespHandler(await axios.all(NASARequests(fiveDCodes)), fiveDCodes, false, 0)
+          ...NASARespHandler(await axios.all(NASARequests(generateNS(0))), generateNS(0), false, 0)
         );
       if (id === 3)
-        profilePosts.push(...MaRoPhoRespHandler(await axios.all(MaRoPhoRequests(dates))));
+        profilePosts.push(
+          ...MaRoPhoRespHandler(await axios.all(MaRoPhoRequests(generateDates(2))))
+        );
       if (id === 4)
         profilePosts.push(...earthRespHandler(await axios.get(EarthRequest), 0, false, 18));
       if (id === 5 && starred.length > 1)
         starredPosts.push(
           ...starLikeRespHandler(await axios.all(starLikeRequests(starred)), starred)
         );
+      // TO DO: Use Replenisher (Make first paint less heavy)
       if (id === 5 && liked.length > 1)
         likedPosts.push(...starLikeRespHandler(await axios.all(starLikeRequests(liked)), liked));
 
@@ -116,11 +137,49 @@ const ProfileScreen = () => {
       setWall(wall);
       setLoad(false);
     };
+
+    const replenisher = async (replenish) => {
+      const newProfilePosts = [];
+      if (id === 0)
+        newProfilePosts.push(
+          ...APODRespHandler(await axios.all(APODRequests(generateDates(18 * replenish + 2))))
+        );
+      if (id === 1)
+        newProfilePosts.push(
+          ...EPICRespHandler(await axios.all(EPICRequests(generateDates(18 * replenish + 2))))
+        );
+      if (id === 2)
+        newProfilePosts.push(
+          ...NASARespHandler(
+            await axios.all(NASARequests(generateNS(replenish * 18))),
+            generateNS(replenish * 18),
+            false,
+            0
+          )
+        );
+      if (id === 3)
+        newProfilePosts.push(
+          ...MaRoPhoRespHandler(await axios.all(MaRoPhoRequests(generateDates(18 * replenish + 2))))
+        );
+      if (id === 4)
+        newProfilePosts.push(
+          ...earthRespHandler(
+            await axios.get(EarthRequest),
+            18 * replenish,
+            false,
+            18 * replenish + 18
+          )
+        );
+      setRepLoad(!repLoad);
+      var newWall = wall;
+      newWall[id] = [...wall[id], ...newProfilePosts];
+      setWall(newWall);
+    };
+
     if (!wall[id]) load();
-    /*if (id !== 5 && !wall[id] === 0) load();
-    else if (id === 5 && ((starred.length !==0 && wall[5].length === 0) || (liked.length !==0 && wall[6].length === 0))) load();*/ else
-      setLoad(false);
-  }, [id]);
+    else if (replenish > 0) replenisher(replenish);
+    else setLoad(false);
+  }, [id, replenish]);
 
   {
     /* if (id === -1) return <404 /> */
@@ -227,20 +286,23 @@ const ProfileScreen = () => {
         )}
 
         {id !== 5 && (
-          <div className="gallery">
-            {wall[id].map((post, index) => {
-              return (
-                <div className="gallery-item" tabIndex="0" key={index}>
-                  <img
-                    src={post.photoURL}
-                    onClick={() => history.push(`p/${id}/${post.id}`)}
-                    className="gallery-image"
-                    alt=""
-                  />
-                </div>
-              );
-            })}
-          </div>
+          <>
+            <div className="gallery">
+              {wall[id].map((post, index) => {
+                return (
+                  <div className="gallery-item" tabIndex="0" key={index}>
+                    <img
+                      src={post.photoURL}
+                      onClick={() => history.push(`p/${id}/${post.id}`)}
+                      className="gallery-image"
+                      alt=""
+                    />
+                  </div>
+                );
+              })}
+            </div>
+            {repLoad && <Image src={spinner} width="100px" className="d-block mx-auto" />}
+          </>
         )}
       </div>
     </Container>
