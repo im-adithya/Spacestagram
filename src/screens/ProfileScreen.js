@@ -38,10 +38,15 @@ const ProfileScreen = () => {
   const location = useLocation();
   const [load, setLoad] = useState(true);
   const [repLoad, setRepLoad] = useState(false);
-  const [replenish, setReplenish] = useState(0);
+
+  const storedDate = JSON.parse(localStorage.getItem('profile-date'));
+  const storedDateMatch =
+    storedDate?.date === new Date().getDate() && storedDate?.month === new Date().getMonth();
+  const storedProfile = JSON.parse(localStorage.getItem('profile'));
+  const storedReplenish = parseInt(localStorage.getItem('profile-replenish'));
+  const [replenish, setReplenish] = useState(storedDateMatch ? storedReplenish : 0);
 
   const user = useContext(AuthContext).currentUser;
-
   const account = location.pathname.substring(1);
   let id = idFetcher(account);
   if (!user && account === 'me') id = -1;
@@ -90,6 +95,7 @@ const ProfileScreen = () => {
         window.removeEventListener('scroll', scrolling_function);
         setRepLoad(true);
         setReplenish(replenish + 1);
+        localStorage.setItem('profile-replenish', replenish + 1);
       }
     };
     if (!repLoad) window.addEventListener('scroll', scrolling_function);
@@ -130,10 +136,21 @@ const ProfileScreen = () => {
           : 0
       );
 
+      const oldLocalWall = storedProfile;
       if (id === 5) {
         wall[5] = starredPosts.reverse();
         wall[6] = likedPosts.reverse();
-      } else wall[id] = profilePosts;
+        oldLocalWall[5] = starredPosts.reverse();
+        oldLocalWall[6] = likedPosts.reverse();
+      } else {
+        wall[id] = profilePosts;
+        oldLocalWall[id] = wall[id];
+      }
+      localStorage.setItem(
+        'profile-date',
+        JSON.stringify({ date: new Date().getDate(), month: new Date().getMonth() })
+      );
+      localStorage.setItem('profile', JSON.stringify(oldLocalWall));
       setWall(wall);
       setLoad(false);
     };
@@ -173,11 +190,22 @@ const ProfileScreen = () => {
       setRepLoad(!repLoad);
       var newWall = wall;
       newWall[id] = [...wall[id], ...newProfilePosts];
+      localStorage.setItem(
+        'profile-date',
+        JSON.stringify({ date: new Date().getDate(), month: new Date().getMonth() })
+      );
+      const oldLocalWall = storedProfile;
+      oldLocalWall[id] = newWall[id];
+      localStorage.setItem('profile', JSON.stringify(oldLocalWall));
       setWall(newWall);
     };
 
-    if (!wall[id]) load();
-    else if (replenish > 0) replenisher(replenish);
+    if (!wall[id]) {
+      if (storedDateMatch && storedProfile[id] && storedProfile[id].length !== 0) {
+        setWall(storedProfile);
+        setLoad(false);
+      } else load();
+    } else if (replenish > 0) replenisher(replenish);
     else setLoad(false);
   }, [id, replenish]);
 
