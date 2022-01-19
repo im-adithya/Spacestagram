@@ -29,8 +29,8 @@ import {
   starLikeRequests
 } from '../constants/requests';
 import {
-  generateProfileFeedDates,
-  generateProfileFeedNS,
+  generateReplenishedFeedDates,
+  generateReplenishedFeedNS,
   generateES as generateFeedES
 } from '../actions/feedHelpers';
 import { generateDates, generateNS } from '../actions/profileHelpers';
@@ -102,29 +102,29 @@ const ProfileScreen = () => {
       if (account_id === 0)
         existingFeed.push(
           ...APODRespHandler(
-            await axios.all(APODRequests(generateProfileFeedDates(2, feedReplenish)))
+            await axios.all(APODRequests(generateReplenishedFeedDates(2, feedReplenish)))
           )
         );
       if (account_id === 0) setApod(APODTodayRespHandler(await axios.get(APODTodayRequest)));
       if (account_id === 1)
         existingFeed.push(
           ...EPICRespHandler(
-            await axios.all(EPICRequests(generateProfileFeedDates(2, feedReplenish)))
+            await axios.all(EPICRequests(generateReplenishedFeedDates(2, feedReplenish)))
           )
         );
       if (account_id === 2)
         existingFeed.push(
           ...NASARespHandler(
-            await axios.all(NASARequests(generateProfileFeedNS(feedReplenish).fiveDCodes)),
-            generateProfileFeedNS(feedReplenish).fiveDCodes,
+            await axios.all(NASARequests(generateReplenishedFeedNS(feedReplenish).fiveDCodes)),
+            generateReplenishedFeedNS(feedReplenish).fiveDCodes,
             true,
-            generateProfileFeedNS(feedReplenish).actualNS
+            generateReplenishedFeedNS(feedReplenish).actualNS
           )
         );
       if (account_id === 3)
         existingFeed.push(
           ...MaRoPhoRespHandler(
-            await axios.all(MaRoPhoRequests(generateProfileFeedDates(2, feedReplenish)))
+            await axios.all(MaRoPhoRequests(generateReplenishedFeedDates(2, feedReplenish)))
           )
         );
       if (account_id === 4)

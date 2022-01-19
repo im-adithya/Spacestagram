@@ -31,7 +31,7 @@ export const generateNS = () => {
   return { fiveDCodes: fiveDCodes.map((c) => c.toString().padStart(5, '0')), actualNS };
 };
 
-export const generateProfileFeedDates = (start, replenish) => {
+export const generateReplenishedFeedDates = (start, replenish) => {
   let dates = [];
   const date = new Date();
   date.setDate(date.getDate() - start);
@@ -42,7 +42,7 @@ export const generateProfileFeedDates = (start, replenish) => {
   return dates;
 };
 
-export const generateProfileFeedNS = (replenish) => {
+export const generateReplenishedFeedNS = (replenish) => {
   // For NASA
   if (localStorage.getItem('nasa') === null) localStorage.setItem('nasa', 1);
   const nasaStart = parseInt(localStorage.getItem('nasa'));

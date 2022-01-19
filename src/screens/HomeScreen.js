@@ -25,7 +25,13 @@ import {
   MaRoPhoRequests,
   EarthRequest
 } from '../constants/requests';
-import { generateDates, generateES, generateNS } from '../actions/feedHelpers';
+import {
+  generateDates,
+  generateES,
+  generateNS,
+  generateReplenishedFeedDates,
+  generateReplenishedFeedNS
+} from '../actions/feedHelpers';
 
 import { AuthContext } from '../Auth';
 import Loader from '../components/Loader';
@@ -75,25 +81,37 @@ const HomeScreen = () => {
     } else {
       const existingFeed = feed;
       if (account_id === 0)
-        existingFeed.push(...APODRespHandler(await axios.all(APODRequests(generateDates(2)))));
+        existingFeed.push(
+          ...APODRespHandler(
+            await axios.all(APODRequests(generateReplenishedFeedDates(2, replenish)))
+          )
+        );
       if (account_id === 0) setApod(APODTodayRespHandler(await axios.get(APODTodayRequest)));
       if (account_id === 1)
-        existingFeed.push(...EPICRespHandler(await axios.all(EPICRequests(generateDates(2)))));
+        existingFeed.push(
+          ...EPICRespHandler(
+            await axios.all(EPICRequests(generateReplenishedFeedDates(2, replenish)))
+          )
+        );
       if (account_id === 2)
         existingFeed.push(
           ...NASARespHandler(
-            await axios.all(NASARequests(generateNS().fiveDCodes)),
-            generateNS().fiveDCodes,
+            await axios.all(NASARequests(generateReplenishedFeedNS(replenish).fiveDCodes)),
+            generateReplenishedFeedNS(replenish).fiveDCodes,
             true,
-            generateNS().actualNS
+            generateReplenishedFeedNS(replenish).actualNS
           )
         );
       if (account_id === 3)
         existingFeed.push(
-          ...MaRoPhoRespHandler(await axios.all(MaRoPhoRequests(generateDates(2))))
+          ...MaRoPhoRespHandler(
+            await axios.all(MaRoPhoRequests(generateReplenishedFeedDates(2, replenish)))
+          )
         );
       if (account_id === 4)
-        existingFeed.push(...earthRespHandler(await axios.get(EarthRequest), generateES(), true));
+        existingFeed.push(
+          ...earthRespHandler(await axios.get(EarthRequest), generateES(), 5 * (replenish + 1))
+        );
 
       existingFeed.sort((a, b) =>
         hyphenToDate(a.date) > hyphenToDate(b.date)
