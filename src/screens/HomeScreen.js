@@ -30,14 +30,17 @@ import { AuthContext } from '../Auth';
 import Loader from '../components/Loader';
 import APOD from '../components/APOD';
 import Post from '../components/Post';
+import spinner from '../assets/spinner.svg';
 
 const HomeScreen = () => {
   const [load, setLoad] = useState(true);
+  const [repLoad, setRepLoad] = useState(false);
   const [progress, setProgress] = useState(0);
   const history = useHistory();
   const user = useContext(AuthContext).currentUser;
-  const { feed, setFeed } = useContext(AuthContext).feed;
-  const { apod, setApod } = useContext(AuthContext).apod;
+  const [feed, setFeed] = useState([]);
+  const [apod, setApod] = useState({});
+  const [replenish, setReplenish] = useState(0);
   const { following, setFollowing } = useContext(AuthContext).following;
 
   const followHandler = (account_id) => {
@@ -51,20 +54,25 @@ const HomeScreen = () => {
     }
   };
 
-  useEffect(() => {
+  const generateDates = (start) => {
     let dates = [];
     const date = new Date();
-    date.setDate(date.getDate() - 2);
+    date.setDate(date.getDate() - start);
     for (let i = 0; i < 5; i++) {
       dates.push(date.toISOString().split('T')[0]);
       date.setDate(date.getDate() - 1);
     }
+    return dates;
+  };
 
+  const generateES = () => {
     // For Earth
-    if (!localStorage.getItem('earth')) localStorage.setItem('earth', 0);
+    if (localStorage.getItem('earth') === null) localStorage.setItem('earth', 0);
     const earthStart = parseInt(localStorage.getItem('earth'));
-    const actualES = earthStart - 2 < 0 ? 0 : earthStart - 2;
+    return earthStart - 2 < 0 ? 0 : earthStart - 2;
+  };
 
+  const generateNS = () => {
     // For NASA
     if (localStorage.getItem('nasa') === null) localStorage.setItem('nasa', 1);
     const nasaStart = parseInt(localStorage.getItem('nasa'));
@@ -76,29 +84,47 @@ const HomeScreen = () => {
       actualNS++;
     }
 
-    fiveDCodes = fiveDCodes.map((c) => c.toString().padStart(5, '0'));
+    return { fiveDCodes: fiveDCodes.map((c) => c.toString().padStart(5, '0')), actualNS };
+  };
 
+  useEffect(() => {
+    const scrolling_function = () => {
+      if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 10 && !repLoad) {
+        window.removeEventListener('scroll', scrolling_function);
+        setRepLoad(true);
+        setReplenish(replenish + 1);
+      }
+    };
+    if (!repLoad) window.addEventListener('scroll', scrolling_function);
+  }, [repLoad]);
+
+  useEffect(() => {
+    const feedPosts = [];
     const loader = async () => {
-      const feedPosts = [];
       var apodtod = {};
       if (following.includes(0))
-        feedPosts.push(...APODRespHandler(await axios.all(APODRequests(dates))));
+        feedPosts.push(...APODRespHandler(await axios.all(APODRequests(generateDates(2)))));
       setProgress(20);
       if (following.includes(0)) apodtod = APODTodayRespHandler(await axios.get(APODTodayRequest));
       setProgress(35);
       if (following.includes(1))
-        feedPosts.push(...EPICRespHandler(await axios.all(EPICRequests(dates))));
+        feedPosts.push(...EPICRespHandler(await axios.all(EPICRequests(generateDates(2)))));
       setProgress(60);
       if (following.includes(2))
         feedPosts.push(
-          ...NASARespHandler(await axios.all(NASARequests(fiveDCodes)), fiveDCodes, true, actualNS)
+          ...NASARespHandler(
+            await axios.all(NASARequests(generateNS().fiveDCodes)),
+            generateNS().fiveDCodes,
+            true,
+            generateNS().actualNS
+          )
         );
       setProgress(70);
       if (following.includes(3))
-        feedPosts.push(...MaRoPhoRespHandler(await axios.all(MaRoPhoRequests(dates))));
+        feedPosts.push(...MaRoPhoRespHandler(await axios.all(MaRoPhoRequests(generateDates(2)))));
       setProgress(85);
       if (following.includes(4))
-        feedPosts.push(...earthRespHandler(await axios.get(EarthRequest), actualES, true));
+        feedPosts.push(...earthRespHandler(await axios.get(EarthRequest), generateES(), true));
       setProgress(100);
 
       feedPosts.sort((a, b) =>
@@ -113,10 +139,48 @@ const HomeScreen = () => {
       setApod(apodtod);
       setLoad(false);
     };
+
+    const replenisher = async (replenish) => {
+      const newFeedPosts = [];
+      if (following.includes(0))
+        newFeedPosts.push(
+          ...APODRespHandler(await axios.all(APODRequests(generateDates(2 + replenish * 5))))
+        );
+      if (following.includes(1))
+        newFeedPosts.push(
+          ...EPICRespHandler(await axios.all(EPICRequests(generateDates(2 + replenish * 5))))
+        );
+      if (following.includes(2))
+        newFeedPosts.push(
+          ...NASARespHandler(
+            await axios.all(NASARequests(generateNS().fiveDCodes)),
+            generateNS().fiveDCodes,
+            true,
+            generateNS().actualNS
+          )
+        );
+      if (following.includes(3))
+        newFeedPosts.push(
+          ...MaRoPhoRespHandler(await axios.all(MaRoPhoRequests(generateDates(2 + replenish * 5))))
+        );
+      if (following.includes(4))
+        newFeedPosts.push(...earthRespHandler(await axios.get(EarthRequest), generateES(), true));
+      newFeedPosts.sort((a, b) =>
+        hyphenToDate(a.date) > hyphenToDate(b.date)
+          ? -1
+          : hyphenToDate(b.date) > hyphenToDate(a.date)
+          ? 1
+          : 0
+      );
+      setRepLoad(!repLoad);
+      setFeed([...feed, ...newFeedPosts]);
+    };
+
     setProgress(10);
-    if (feed.length === 0) loader();
+    if (feed?.length === 0) loader();
+    else if (replenish > 0) replenisher(replenish);
     else setLoad(false);
-  }, []);
+  }, [replenish]);
 
   if (load) return <Loader showProgress progress={progress} />;
 
@@ -139,6 +203,7 @@ const HomeScreen = () => {
               />
             );
           })}
+          {repLoad && <Image src={spinner} width="100px" className="d-block mx-auto" />}
         </Col>
         <Col className="d-none d-md-block" md={4}>
           <div className="top-space-1 sticky-top">
