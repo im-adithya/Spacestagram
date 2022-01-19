@@ -7,6 +7,7 @@ import { Timer } from '../constants/timer';
 import logo from '../assets/logo-font-white.svg';
 import link from '../assets/link.svg';
 import cross from '../assets/cross.svg';
+import broken from '../assets/broken.png';
 
 const FullViewer = ({ fullView }) => {
   const redir = fullView.split('///')[0];
@@ -51,7 +52,13 @@ const FullViewer = ({ fullView }) => {
         <div
           className="display d-flex justify-content-center align-items-center"
           onClick={pausePlay}>
-          <Image src={photoURL} className="fullviewimg" />
+          <Image
+            src={photoURL}
+            onError={(e) => {
+              e.currentTarget.src = broken;
+            }}
+            className="fullviewimg"
+          />
         </div>
         <div className="fv-progress mt-3">
           <div className={'fv-progress-bar ' + (flag ? 'paused' : '')}></div>

@@ -12,6 +12,7 @@ import heart from '../assets/heart.svg';
 import share from '../assets/share.svg';
 import star from '../assets/star.svg';
 import full from '../assets/full.svg';
+import broken from '../assets/broken.png';
 
 import heartfillwhite from '../assets/heart-fill-white.svg';
 import heartfill from '../assets/heart-fill.svg';
@@ -113,7 +114,7 @@ const Post = ({ account_id, id, photoURL, description, date, fullpage }) => {
             </div>
           </div>
           {!fullpage && (
-            <Image
+            <img
               src={full}
               className="pointer action-icon p-2"
               onClick={() => {
@@ -131,7 +132,14 @@ const Post = ({ account_id, id, photoURL, description, date, fullpage }) => {
               (heartAnimate ? 'like' : '')
             }
           />
-          <Image src={photoURL} className="w-100 h-auto" onClick={handleClick} />
+          <Image
+            src={photoURL}
+            onError={(e) => {
+              e.currentTarget.src = broken;
+            }}
+            className="w-100 h-auto"
+            onClick={handleClick}
+          />
         </div>
         {user && (
           <div className="controls d-flex justify-content-between align-items-center p-2">

@@ -29,9 +29,11 @@ import {
 
 import { AuthContext } from '../Auth';
 import Loader from '../components/Loader';
+import NotFound from './NotFound';
 
 import none from '../assets/none.svg';
 import spinner from '../assets/spinner.svg';
+import broken from '../assets/broken.png';
 
 const ProfileScreen = () => {
   const history = useHistory();
@@ -209,9 +211,8 @@ const ProfileScreen = () => {
     else setLoad(false);
   }, [id, replenish]);
 
-  {
-    /* if (id === -1) return <404 /> */
-  }
+  if (id === -1) return <NotFound />;
+
   if (load) return <Loader />;
 
   return (
@@ -277,8 +278,11 @@ const ProfileScreen = () => {
             {wall[5].map((post, index) => {
               return (
                 <div className="gallery-item" tabIndex="0" key={index}>
-                  <img
+                  <Image
                     src={post.photoURL}
+                    onError={(e) => {
+                      e.currentTarget.src = broken;
+                    }}
                     onClick={() => history.push(`p/${post.id}`)}
                     className="gallery-image"
                     alt=""
@@ -301,8 +305,11 @@ const ProfileScreen = () => {
             {wall[6].map((post, index) => {
               return (
                 <div className="gallery-item" tabIndex="0" key={index}>
-                  <img
+                  <Image
                     src={post.photoURL}
+                    onError={(e) => {
+                      e.currentTarget.src = broken;
+                    }}
                     onClick={() => history.push(`p/${post.id}`)}
                     className="gallery-image"
                     alt=""
@@ -319,8 +326,11 @@ const ProfileScreen = () => {
               {wall[id].map((post, index) => {
                 return (
                   <div className="gallery-item" tabIndex="0" key={index}>
-                    <img
+                    <Image
                       src={post.photoURL}
+                      onError={(e) => {
+                        e.currentTarget.src = broken;
+                      }}
                       onClick={() => history.push(`p/${id}/${post.id}`)}
                       className="gallery-image"
                       alt=""
