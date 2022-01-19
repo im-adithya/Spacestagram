@@ -49,7 +49,7 @@ const ProfileScreen = () => {
   const liked = useContext(AuthContext).liked.liked;
   const starred = useContext(AuthContext).starred.starred;
 
-  const { wall, setWall } = useContext(AuthContext).wall;
+  const [wall, setWall] = useState([]);
   const { following, setFollowing } = useContext(AuthContext).following;
 
   const followHandler = (account_id) => {

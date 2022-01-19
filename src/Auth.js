@@ -11,7 +11,6 @@ export const AuthProvider = ({ children }) => {
   const [liked, setLiked] = useState([]);
   const [starred, setStarred] = useState([]);
   const [userLoading, setUserLoading] = useState(true);
-  const [wall, setWall] = useState([]);
   const [popup, setPopup] = useState('');
   const [fullView, setFullView] = useState('');
 
@@ -42,7 +41,6 @@ export const AuthProvider = ({ children }) => {
         liked: { liked, setLiked },
         starred: { starred, setStarred },
         userLoading: { userLoading, setUserLoading },
-        wall: { wall, setWall },
         popup: { popup, setPopup },
         fv: { fullView, setFullView }
       }}>
