@@ -29,9 +29,9 @@ import {
   starLikeRequests
 } from '../constants/requests';
 import {
-  generateDates as generateFeedDates,
-  generateES as generateFeedES,
-  generateNS as generateFeedNS
+  generateProfileFeedDates,
+  generateProfileFeedNS,
+  generateES as generateFeedES
 } from '../actions/feedHelpers';
 import { generateDates, generateNS } from '../actions/profileHelpers';
 
@@ -55,6 +55,14 @@ const ProfileScreen = () => {
   const storedProfile = localStorage.getItem('profile')
     ? JSON.parse(localStorage.getItem('profile'))
     : {};
+
+  const storedFeedDate = JSON.parse(localStorage.getItem('home-date'));
+  const storedFeedDateMatch =
+    storedFeedDate?.date === new Date().getDate() &&
+    storedFeedDate?.month === new Date().getMonth();
+  const storedFeedReplenish = parseInt(localStorage.getItem('home-replenish'));
+  const feedReplenish = storedFeedDateMatch ? storedFeedReplenish : 0;
+
   const storedReplenish = parseInt(localStorage.getItem('profile-replenish'));
   const [replenish, setReplenish] = useState(storedDateMatch ? storedReplenish : 0);
 
@@ -92,26 +100,41 @@ const ProfileScreen = () => {
     } else {
       const existingFeed = feed;
       if (account_id === 0)
-        existingFeed.push(...APODRespHandler(await axios.all(APODRequests(generateFeedDates(2)))));
+        existingFeed.push(
+          ...APODRespHandler(
+            await axios.all(APODRequests(generateProfileFeedDates(2, feedReplenish)))
+          )
+        );
       if (account_id === 0) setApod(APODTodayRespHandler(await axios.get(APODTodayRequest)));
       if (account_id === 1)
-        existingFeed.push(...EPICRespHandler(await axios.all(EPICRequests(generateFeedDates(2)))));
+        existingFeed.push(
+          ...EPICRespHandler(
+            await axios.all(EPICRequests(generateProfileFeedDates(2, feedReplenish)))
+          )
+        );
       if (account_id === 2)
         existingFeed.push(
           ...NASARespHandler(
-            await axios.all(NASARequests(generateFeedNS().fiveDCodes)),
-            generateFeedNS().fiveDCodes,
+            await axios.all(NASARequests(generateProfileFeedNS(feedReplenish).fiveDCodes)),
+            generateProfileFeedNS(feedReplenish).fiveDCodes,
             true,
-            generateFeedNS().actualNS
+            generateProfileFeedNS(feedReplenish).actualNS
           )
         );
       if (account_id === 3)
         existingFeed.push(
-          ...MaRoPhoRespHandler(await axios.all(MaRoPhoRequests(generateFeedDates(2))))
+          ...MaRoPhoRespHandler(
+            await axios.all(MaRoPhoRequests(generateProfileFeedDates(2, feedReplenish)))
+          )
         );
       if (account_id === 4)
         existingFeed.push(
-          ...earthRespHandler(await axios.get(EarthRequest), generateFeedES(), true)
+          ...earthRespHandler(
+            await axios.get(EarthRequest),
+            generateFeedES(),
+            true,
+            5 * (replenish + 1)
+          )
         );
 
       existingFeed.sort((a, b) =>

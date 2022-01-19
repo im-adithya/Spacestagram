@@ -206,7 +206,7 @@ export const MaRoPhoSingleRespHandler = (resp) => {
 
 export const earthRespHandler = (resp, actualES, feed, end = 5) => {
   let earthResps = resp.data.collection.items.slice(actualES, end);
-  if (feed) localStorage.setItem('earth', actualES + 5);
+  if (feed) localStorage.setItem('earth', actualES + end);
   return earthResps.map((el) => {
     var o = {};
     o.account = 4;

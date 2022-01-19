@@ -30,3 +30,29 @@ export const generateNS = () => {
 
   return { fiveDCodes: fiveDCodes.map((c) => c.toString().padStart(5, '0')), actualNS };
 };
+
+export const generateProfileFeedDates = (start, replenish) => {
+  let dates = [];
+  const date = new Date();
+  date.setDate(date.getDate() - start);
+  for (let i = 0; i < 5 * (replenish + 1); i++) {
+    dates.push(date.toISOString().split('T')[0]);
+    date.setDate(date.getDate() - 1);
+  }
+  return dates;
+};
+
+export const generateProfileFeedNS = (replenish) => {
+  // For NASA
+  if (localStorage.getItem('nasa') === null) localStorage.setItem('nasa', 1);
+  const nasaStart = parseInt(localStorage.getItem('nasa'));
+  let actualNS = nasaStart - 2 < 0 ? 1 : nasaStart - 2;
+
+  let fiveDCodes = [];
+  for (let i = 0; i < 5 * (replenish + 1); i++) {
+    fiveDCodes.push(actualNS);
+    actualNS++;
+  }
+
+  return { fiveDCodes: fiveDCodes.map((c) => c.toString().padStart(5, '0')), actualNS };
+};
