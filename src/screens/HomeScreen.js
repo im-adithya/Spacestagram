@@ -51,13 +51,59 @@ const HomeScreen = () => {
   const [apod, setApod] = useState({});
   const [replenish, setReplenish] = useState(storedDateMatch ? storedReplenish : 0);
   const { following, setFollowing } = useContext(AuthContext).following;
+  const { setPopup } = useContext(AuthContext).popup;
 
-  const followHandler = (account_id) => {
+  const followHandler = async (account_id) => {
     if (following.includes(account_id)) {
       let newFollowing = following.filter((a) => a !== account_id);
       setFollowing(newFollowing);
       followAccount(newFollowing);
+
+      setPopup(`Unfollowed ${USERNAMES[account_id]}`);
+      setTimeout(() => {
+        setPopup(null);
+      }, 1200);
+
+      const newFeed = feed.filter((post) => post.account !== account_id);
+      setFeed(newFeed);
+      localStorage.setItem('feed', JSON.stringify(newFeed));
     } else {
+      const existingFeed = feed;
+      if (account_id === 0)
+        existingFeed.push(...APODRespHandler(await axios.all(APODRequests(generateDates(2)))));
+      if (account_id === 0) setApod(APODTodayRespHandler(await axios.get(APODTodayRequest)));
+      if (account_id === 1)
+        existingFeed.push(...EPICRespHandler(await axios.all(EPICRequests(generateDates(2)))));
+      if (account_id === 2)
+        existingFeed.push(
+          ...NASARespHandler(
+            await axios.all(NASARequests(generateNS().fiveDCodes)),
+            generateNS().fiveDCodes,
+            true,
+            generateNS().actualNS
+          )
+        );
+      if (account_id === 3)
+        existingFeed.push(
+          ...MaRoPhoRespHandler(await axios.all(MaRoPhoRequests(generateDates(2))))
+        );
+      if (account_id === 4)
+        existingFeed.push(...earthRespHandler(await axios.get(EarthRequest), generateES(), true));
+
+      existingFeed.sort((a, b) =>
+        hyphenToDate(a.date) > hyphenToDate(b.date)
+          ? -1
+          : hyphenToDate(b.date) > hyphenToDate(a.date)
+          ? 1
+          : 0
+      );
+      localStorage.setItem('feed', JSON.stringify(existingFeed));
+      setFeed(existingFeed);
+      setPopup(`Started following ${USERNAMES[account_id]}`);
+      setTimeout(() => {
+        setPopup(null);
+      }, 1200);
+
       setFollowing([...following, account_id]);
       followAccount([...following, account_id]);
     }
