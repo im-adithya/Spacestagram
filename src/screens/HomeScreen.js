@@ -38,9 +38,18 @@ const HomeScreen = () => {
   const [progress, setProgress] = useState(0);
   const history = useHistory();
   const user = useContext(AuthContext).currentUser;
+
+  const storedDate = JSON.parse(localStorage.getItem('home-date'));
+
+  const storedDateMatch =
+    storedDate?.date === new Date().getDate() && storedDate?.month === new Date().getMonth();
+  const storedFeed = JSON.parse(localStorage.getItem('feed'));
+  const storedApod = JSON.parse(localStorage.getItem('apod'));
+  const storedReplenish = parseInt(localStorage.getItem('home-replenish'));
+
   const [feed, setFeed] = useState([]);
   const [apod, setApod] = useState({});
-  const [replenish, setReplenish] = useState(0);
+  const [replenish, setReplenish] = useState(storedDateMatch ? storedReplenish : 0);
   const { following, setFollowing } = useContext(AuthContext).following;
 
   const followHandler = (account_id) => {
@@ -93,6 +102,7 @@ const HomeScreen = () => {
         window.removeEventListener('scroll', scrolling_function);
         setRepLoad(true);
         setReplenish(replenish + 1);
+        localStorage.setItem('home-replenish', replenish + 1);
       }
     };
     if (!repLoad) window.addEventListener('scroll', scrolling_function);
@@ -135,7 +145,13 @@ const HomeScreen = () => {
           : 0
       );
 
+      localStorage.setItem(
+        'home-date',
+        JSON.stringify({ date: new Date().getDate(), month: new Date().getMonth() })
+      );
+      localStorage.setItem('feed', JSON.stringify(feedPosts));
       setFeed(feedPosts);
+      localStorage.setItem('apod', JSON.stringify(apodtod));
       setApod(apodtod);
       setLoad(false);
     };
@@ -173,12 +189,25 @@ const HomeScreen = () => {
           : 0
       );
       setRepLoad(!repLoad);
+      localStorage.setItem(
+        'home-date',
+        JSON.stringify({ date: new Date().getDate(), month: new Date().getMonth() })
+      );
+      localStorage.setItem('feed', JSON.stringify([...feed, ...newFeedPosts]));
       setFeed([...feed, ...newFeedPosts]);
+      // Here we are ignoring the case where the user misses the APOD
+      // post while passing the day in the middle during replenishment
     };
 
     setProgress(10);
-    if (feed?.length === 0) loader();
-    else if (replenish > 0) replenisher(replenish);
+    if (feed?.length === 0) {
+      if (storedDateMatch) {
+        setFeed(storedFeed);
+        setApod(storedApod);
+        setProgress(100);
+        setLoad(false);
+      } else loader();
+    } else if (replenish > 0) replenisher(replenish);
     else setLoad(false);
   }, [replenish]);
 
