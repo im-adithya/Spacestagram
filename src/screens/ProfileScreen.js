@@ -52,7 +52,9 @@ const ProfileScreen = () => {
   const storedDate = JSON.parse(localStorage.getItem('profile-date'));
   const storedDateMatch =
     storedDate?.date === new Date().getDate() && storedDate?.month === new Date().getMonth();
-  const storedProfile = JSON.parse(localStorage.getItem('profile'));
+  const storedProfile = localStorage.getItem('profile')
+    ? JSON.parse(localStorage.getItem('profile'))
+    : {};
   const storedReplenish = parseInt(localStorage.getItem('profile-replenish'));
   const [replenish, setReplenish] = useState(storedDateMatch ? storedReplenish : 0);
 
@@ -82,7 +84,6 @@ const ProfileScreen = () => {
       }, 1200);
 
       const newFeed = feed.filter((post) => post.account !== account_id);
-      setFeed([]);
       localStorage.setItem(
         'home-date',
         JSON.stringify({ date: new Date().getDate(), month: new Date().getMonth() })
@@ -125,7 +126,6 @@ const ProfileScreen = () => {
         JSON.stringify({ date: new Date().getDate(), month: new Date().getMonth() })
       );
       localStorage.setItem('feed', JSON.stringify(existingFeed));
-      setFeed([]);
       setPopup(`Started following ${USERNAMES[account_id]}`);
       setTimeout(() => {
         setPopup(null);
@@ -149,6 +149,7 @@ const ProfileScreen = () => {
   }, [repLoad]);
 
   useEffect(() => {
+    setFeed([]);
     const load = async () => {
       const profilePosts = [];
       const starredPosts = [];
