@@ -328,7 +328,7 @@ const ProfileScreen = () => {
                     key={index}
                     className="text-2 mr-1 pointer"
                     onClick={() => {
-                      history.push('/' + USERNAMES[account].toLowerCase());
+                      window.location = `/${USERNAMES[account].toLowerCase()}`;
                     }}>
                     {USERNAMES[account]}
                   </div>
