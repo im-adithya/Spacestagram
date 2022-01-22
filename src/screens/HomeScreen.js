@@ -58,7 +58,10 @@ const HomeScreen = () => {
   const { feed, setFeed } = useContext(AuthContext).feed;
   const { apod, setApod } = useContext(AuthContext).apod;
   const [replenish, setReplenish] = useState(storedDateMatch ? storedReplenish : 0);
-  const { following, setFollowing } = useContext(AuthContext).following;
+  const { setFollowing } = useContext(AuthContext).following;
+  const following = useContext(AuthContext).following.following
+    ? useContext(AuthContext).following.following
+    : [];
   const { setPopup } = useContext(AuthContext).popup;
 
   const followHandler = async (account_id) => {
@@ -269,7 +272,7 @@ const HomeScreen = () => {
     <Container>
       <Row>
         <Col xs={12} md={8} className="top-space-1">
-          {(following ? following : []).includes(0) && (
+          {following.includes(0) && (
             <APOD photoURL={apod.photoURL} description={apod.description} date={apod.date} />
           )}
           {feed.map((post, index) => {
@@ -284,7 +287,7 @@ const HomeScreen = () => {
               />
             );
           })}
-          {!following && (
+          {!following.length && (
             <>
               <Image src={none} className="d-block mx-auto mt-5" width="250px" />
               <p className="text-17 mt-3 text-center">Follow accounts to view images here.</p>
@@ -316,7 +319,7 @@ const HomeScreen = () => {
             </div>
             <div className="mb-3">
               <p className="text-3">Accounts you follow</p>
-              {(following ? following : []).map((value, index) => {
+              {following.map((value, index) => {
                 return (
                   <div
                     className="d-flex align-items-center justify-content-between mb-2"
@@ -345,34 +348,32 @@ const HomeScreen = () => {
             </div>
             <div className="mb-3">
               <p className="text-3">Suggestions for you</p>
-              {ALL_ACCOUNTS.filter((a) => !(following ? following : []).includes(a)).map(
-                (value, index) => {
-                  return (
+              {ALL_ACCOUNTS.filter((a) => !following.includes(a)).map((value, index) => {
+                return (
+                  <div
+                    className="d-flex align-items-center justify-content-between mb-2"
+                    key={index}>
                     <div
-                      className="d-flex align-items-center justify-content-between mb-2"
-                      key={index}>
-                      <div
-                        className="d-flex align-items-center pointer"
-                        onClick={() => {
-                          history.push('/' + USERNAMES[value].toLowerCase());
-                        }}>
-                        <Image
-                          src={pictureFetcher(value)}
-                          width="40px"
-                          className="rounded-circle home-dp"
-                        />
-                        <div className="ml-3">
-                          <p className="text-5 mb-0">{USERNAMES[value]}</p>
-                          <p className="text-6 mb-0">{ACCOUNTS[value]}</p>
-                        </div>
-                      </div>
-                      <div className="text-4 ml-2 pointer" onClick={() => followHandler(value)}>
-                        Follow
+                      className="d-flex align-items-center pointer"
+                      onClick={() => {
+                        history.push('/' + USERNAMES[value].toLowerCase());
+                      }}>
+                      <Image
+                        src={pictureFetcher(value)}
+                        width="40px"
+                        className="rounded-circle home-dp"
+                      />
+                      <div className="ml-3">
+                        <p className="text-5 mb-0">{USERNAMES[value]}</p>
+                        <p className="text-6 mb-0">{ACCOUNTS[value]}</p>
                       </div>
                     </div>
-                  );
-                }
-              )}
+                    <div className="text-4 ml-2 pointer" onClick={() => followHandler(value)}>
+                      Follow
+                    </div>
+                  </div>
+                );
+              })}
             </div>
             <p className="text-8 mb-0">
               &copy; 2022{' '}

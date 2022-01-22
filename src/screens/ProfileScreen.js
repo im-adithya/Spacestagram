@@ -77,7 +77,10 @@ const ProfileScreen = () => {
   const [wall, setWall] = useState([]);
   const { feed, setFeed } = useContext(AuthContext).feed;
   const { setApod } = useContext(AuthContext).apod;
-  const { following, setFollowing } = useContext(AuthContext).following;
+  const { setFollowing } = useContext(AuthContext).following;
+  const following = useContext(AuthContext).following.following
+    ? useContext(AuthContext).following.following
+    : [];
   const { setPopup } = useContext(AuthContext).popup;
 
   const followHandler = async (account_id) => {
