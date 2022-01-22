@@ -26,7 +26,7 @@ export const useLogin = () => {
             });
         } else {
           authContext.userLoading.setUserLoading(false);
-          //window.location.reload();
+          window.location.reload();
         }
       })
       .catch((error) => {
