@@ -159,6 +159,9 @@ const HomeScreen = () => {
       }
     };
     if (!repLoad) window.addEventListener('scroll', scrolling_function);
+    return () => {
+      window.removeEventListener('scroll', scrolling_function);
+    };
   }, [repLoad]);
 
   useEffect(() => {
